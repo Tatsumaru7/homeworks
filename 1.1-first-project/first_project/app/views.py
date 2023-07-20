@@ -1,7 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render, reverse
+import datetime
+import pytz
+import os
 
-
+                      
 def home_view(request):
     template_name = 'app/home.html'
 
@@ -18,15 +21,16 @@ def home_view(request):
 
 
 def time_view(request):
-    # обратите внимание – здесь HTML шаблона нет, 
-    # возвращается просто текст
-    current_time = None
-    msg = f'Текущее время: {current_time}'
-    return HttpResponse(msg)
+    # Выбираем Московскую временную зону
+    moscow_tz = pytz.timezone('Europe/Moscow')
+    return HttpResponse(f'time = {datetime.datetime.now(tz=moscow_tz).time()}')
 
 
-def workdir_view(request):
-    # по аналогии с `time_view`, напишите код,
-    # который возвращает список файлов в рабочей 
-    # директории
-    raise NotImplemented
+def workdir_view(request):  
+    # Получаем рабочую директорию
+    workdir = os.getcwd()
+    # Получаем список файлов и каталогов в рабочей директории
+    file_list = os.listdir(workdir)
+    # Формируем ответ HttpResponse с перечислением файлов
+    response_content = "\n".join(file_list)
+    return HttpResponse(response_content, content_type='text/plain')
