@@ -8,4 +8,4 @@ class AdvertisementAdmin(admin.ModelAdmin):
 
 admin.site.register(Advertisement, AdvertisementAdmin)
 
-# Register your models here.
+
