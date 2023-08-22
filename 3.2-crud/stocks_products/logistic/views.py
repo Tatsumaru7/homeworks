@@ -22,13 +22,12 @@ class StockFilter(django_filters.FilterSet):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    pagination_class = CustomPagination  # Добавляем пагинацию
+    pagination_class = CustomPagination
 
 class StockViewSet(ModelViewSet):
     queryset = Stock.objects.all()
     serializer_class = StockSerializer
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_class = StockFilter  # Используем filterset_class
-    search_fields = ('product__name', 'product__description')
-
+    filterset_class = StockFilter
+    search_fields = ('products__name', 'products__description') 

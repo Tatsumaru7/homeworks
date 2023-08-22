@@ -8,10 +8,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductPositionSerializer(serializers.ModelSerializer):
-    # настройте сериализатор для позиции продукта на складе
+    product_name = serializers.CharField(source='product.products__name', read_only=True)
+    product_description = serializers.CharField(source='product.products__description', read_only=True)
+
     class Meta:
         model = StockProduct
-        fields = ['product', 'quantity', 'price']
+        fields = ['product_name', 'product_description', 'quantity', 'price']
 
 
 class StockSerializer(serializers.ModelSerializer):
