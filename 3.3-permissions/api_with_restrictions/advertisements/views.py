@@ -14,10 +14,6 @@ from .permissions import IsAdvertisementOwnerPermission
 class CustomUserThrottle(UserRateThrottle):
     rate = "10/day"  
 
-class IsAdvertisementOwnerPermission(IsAuthenticated):
-    def has_object_permission(self, request, view, obj):
-        return obj.creator == request.user
-
 class AdvertisementViewSet(ModelViewSet):
     queryset = Advertisement.objects.annotate(open_count=Count('id', filter=Q(status='OPEN')))
     serializer_class = AdvertisementSerializer
