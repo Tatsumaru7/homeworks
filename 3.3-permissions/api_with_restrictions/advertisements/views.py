@@ -7,6 +7,12 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.viewsets import ModelViewSet
 from advertisements.models import Advertisement
 from .serializers import AdvertisementSerializer
+from rest_framework.throttling import UserRateThrottle
+from .filters import AdvertisementFilter
+from .permissions import IsAdvertisementOwnerPermission
+
+class CustomUserThrottle(UserRateThrottle):
+    rate = "10/day"  
 
 class IsAdvertisementOwnerPermission(IsAuthenticated):
     def has_object_permission(self, request, view, obj):
@@ -16,6 +22,7 @@ class AdvertisementViewSet(ModelViewSet):
     queryset = Advertisement.objects.annotate(open_count=Count('id', filter=Q(status='OPEN')))
     serializer_class = AdvertisementSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = AdvertisementFilter
     filterset_fields = ['created_at', 'status']
     ordering_fields = ['created_at']
     throttle_classes = [UserRateThrottle]
@@ -28,14 +35,4 @@ class AdvertisementViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
 
-    def perform_update(self, serializer):
-        advertisement = serializer.instance
-        if advertisement.creator != self.request.user:
-            raise PermissionDenied("You don't have permission to update this advertisement.")
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.creator != self.request.user:
-            raise PermissionDenied("You don't have permission to delete this advertisement.")
-        instance.delete()
 
