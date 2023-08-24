@@ -19,7 +19,6 @@ def test_list_courses(api_client, course_factory):
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) == len(courses)
 
-# Пример теста успешного создания курса
 @pytest.mark.django_db
 def test_create_course(api_client):
     data = {'name': 'New Course'}
@@ -28,7 +27,6 @@ def test_create_course(api_client):
     assert response.status_code == status.HTTP_201_CREATED
     assert Course.objects.filter(name=data['name']).exists()
 
-# Пример теста успешного обновления курса
 @pytest.mark.django_db
 def test_update_course(api_client, course_factory):
     course = course_factory()
@@ -38,7 +36,6 @@ def test_update_course(api_client, course_factory):
     assert response.status_code == status.HTTP_200_OK
     assert Course.objects.get(pk=course.pk).name == data['name']
 
-# Пример теста успешного удаления курса
 @pytest.mark.django_db
 def test_delete_course(api_client, course_factory):
     course = course_factory()
@@ -46,3 +43,23 @@ def test_delete_course(api_client, course_factory):
     response = api_client.delete(url)
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert not Course.objects.filter(pk=course.pk).exists()
+
+# Тест фильтрации по id
+@pytest.mark.django_db
+def test_filter_course_by_id(api_client, course_factory):
+    course = course_factory()
+    url = reverse('courses-list')
+    response = api_client.get(url, {'id': course.pk})  # Фильтрация по id
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data) == 1
+    assert response.data[0]['id'] == course.pk
+
+# Тест фильтрации по названию курса
+@pytest.mark.django_db
+def test_filter_course_by_name(api_client, course_factory):
+    course = course_factory(name='Math Course')
+    url = reverse('courses-list')
+    response = api_client.get(url, {'name': 'Math Course'})  # Фильтрация по названию
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data) == 1
+    assert response.data[0]['name'] == 'Math Course'
